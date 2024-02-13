@@ -1,4 +1,4 @@
-﻿namespace Apeirox.Lexer;
+﻿namespace Apeirox.Lexing;
 public class LexerBuilder
 {
     private Dictionary<string, string> patterns = new Dictionary<string, string>();

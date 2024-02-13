@@ -1,4 +1,4 @@
-using Apeirox.Lexer;
+using Apeirox.Lexing;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Apeirox.Lexer;
+namespace Apeirox.Lexing;
 public class Lexer
 {
     private Dictionary<string, string> patterns;

@@ -1,4 +1,4 @@
-using Apeirox.Lexer;
+using Apeirox.Lexing;
 using Xunit.Abstractions;
 
 namespace Apeirox.Tests;
