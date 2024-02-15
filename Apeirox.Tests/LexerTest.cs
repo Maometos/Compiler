@@ -1,37 +1,48 @@
 using Apeirox.Lexing;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
 namespace Apeirox.Tests;
 
 public class LexerTest
 {
+    private readonly ITestOutputHelper output;
+    public LexerTest(ITestOutputHelper output)
+    {
+        this.output = output;
+    }
+
     [Fact]
     public void Test()
     {
         LexerBuilder lexerBuilder = new LexerBuilder();
         lexerBuilder.Take("variable", @"[A-Za-z_][\w]*");
         lexerBuilder.Take("number", @"\d");
+        lexerBuilder.Take("times", @"(\*|/)");
+        lexerBuilder.Take("sign", @"(\+|-)");
         lexerBuilder.Take("equal", @"=");
         lexerBuilder.Take("semicolon", @";");
         lexerBuilder.Skip(@"\s+");
 
         var lexer = lexerBuilder.Build();
-        var statment = "x1 = 5;";
-        lexer.Consume(statment);
+        var statement = "x1 = 2 * 5 + 4;";
+        lexer.Consume(statement);
 
-        lexer.Advance();
-        Assert.Equal("x1", lexer.Token.Value);
+        string[] expectedValues = ["x1", "=", "2", "*", "5", "+", "4", ";"];
+        var index = 0;
 
-        lexer.Advance();
-        Assert.Equal("=", lexer.Token.Value);
+        while (true)
+        {
+            lexer.Advance();
 
-        lexer.Advance();
-        Assert.Equal("5", lexer.Token.Value);
+            if (lexer.Token.Type == "END")
+            {
+                break;
+            }
 
-        lexer.Advance();
-        Assert.Equal(";", lexer.Token.Value);
+            Assert.Equal(expectedValues[index], lexer.Token.Value);
+            output.WriteLine("Token: " + lexer.Token.Type + " => " + lexer.Token.Value);
+            index++;
+        }
     }
 
     [Fact]
@@ -41,8 +52,8 @@ public class LexerTest
         lexerBuilder.Take("variable", @"[A-Za-z_][\w]*");
 
         var lexer = lexerBuilder.Build();
-        var statment = "x1 = 5;";
-        lexer.Consume(statment);
+        var statement = "x1 = 5;";
+        lexer.Consume(statement);
         //The first occurrence must match x1 according to the given pattern.
         lexer.Advance();
         Assert.Equal("x1", lexer.Token.Value);
