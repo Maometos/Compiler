@@ -1,4 +1,5 @@
 ﻿namespace Apeirox.Parsing;
+
 public class Node
 {
     public string Type { get; set; }

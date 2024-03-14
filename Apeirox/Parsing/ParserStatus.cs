@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace Apeirox.Parsing;
+﻿namespace Apeirox.Parsing;
 public enum ParserStatus
 {
     Shift,

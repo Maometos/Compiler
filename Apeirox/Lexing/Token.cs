@@ -1,4 +1,5 @@
 ﻿namespace Apeirox.Lexing;
+
 public class Token
 {
     public string Type { get; set; }

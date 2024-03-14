@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Apeirox.Parsing;
+﻿namespace Apeirox.Parsing;
 public class Rule
 {
     public int Id { get; }

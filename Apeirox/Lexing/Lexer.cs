@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 
 namespace Apeirox.Lexing;
+
 public class Lexer
 {
     private Dictionary<string, string> patterns;
