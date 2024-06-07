@@ -1,6 +1,7 @@
-﻿using Apeirox.Lexing;
+﻿using Compiler.Lexing;
 
-namespace Apeirox.Parsing;
+namespace Compiler.Parsing;
+
 public class ParserBuilder
 {
     public List<Rule> rules = new List<Rule>();

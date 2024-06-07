@@ -1,14 +1,14 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Apeirox.Lexing;
+namespace Compiler.Lexing;
 
 public class Lexer
 {
+    public Token Token { get; set; } = new Token("START");
     private Dictionary<string, string> patterns;
     private StringBuilder input = new StringBuilder();
     private int offset = 0;
-    public Token Token { get; set; } = new Token("START");
 
     public Lexer(Dictionary<string, string> patterns)
     {
@@ -24,11 +24,14 @@ public class Lexer
     public void Advance()
     {
         bool matched = false;
-        foreach (var pattern in patterns) {
-            if (input.ToString() == string.Empty) {
+        foreach (var pattern in patterns)
+        {
+            if (input.ToString() == string.Empty)
+            {
                 Token = new Token("END");
                 break;
-            } else
+            }
+            else
             {
                 var match = Regex.Match(input.ToString(), "^" + pattern.Value);
                 if (match.Success)
@@ -38,7 +41,7 @@ public class Lexer
                     Token = new Token(pattern.Key, tokenValue);
                     offset += tokenValue.Length;
                     input.Remove(0, tokenValue.Length);
-                   
+
                     if (pattern.Key == "SKIP")
                     {
                         Advance();
@@ -48,7 +51,8 @@ public class Lexer
             }
         }
 
-        if (!matched && input.ToString() != string.Empty) {
+        if (!matched && input.ToString() != string.Empty)
+        {
             throw new LexerException("Unmatched token for the input string at the offset of: " + offset);
         }
     }

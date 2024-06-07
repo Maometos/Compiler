@@ -1,4 +1,4 @@
-﻿namespace Apeirox.Lexing;
+﻿namespace Compiler.Lexing;
 
 public class Token
 {

@@ -1,11 +1,12 @@
-using Apeirox.Lexing;
+using Compiler.Lexing;
 using Xunit.Abstractions;
 
-namespace Apeirox.Tests;
+namespace Compiler.Tests;
 
 public class LexerTest
 {
     private readonly ITestOutputHelper output;
+
     public LexerTest(ITestOutputHelper output)
     {
         this.output = output;

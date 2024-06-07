@@ -1,4 +1,4 @@
-﻿namespace Apeirox.Parsing;
+﻿namespace Compiler.Parsing;
 
 public class ParserException : Exception
 {

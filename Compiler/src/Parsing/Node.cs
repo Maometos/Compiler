@@ -1,4 +1,4 @@
-﻿namespace Apeirox.Parsing;
+﻿namespace Compiler.Parsing;
 
 public class Node
 {
@@ -7,7 +7,7 @@ public class Node
     public List<Node> Children { get; set; } = new List<Node>();
 
     public Node(string type, string? value = null)
-    { 
+    {
         Type = type;
         Value = value;
     }

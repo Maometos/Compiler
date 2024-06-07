@@ -1,13 +1,14 @@
-using Apeirox.Lexing;
-using Apeirox.Parsing;
+using Compiler.Lexing;
+using Compiler.Parsing;
 using System.Text.Json;
 using Xunit.Abstractions;
 
-namespace Apeirox.Tests;
+namespace Compiler.Tests;
 
 public class ParserTest
 {
     private readonly ITestOutputHelper output;
+
     public ParserTest(ITestOutputHelper output)
     {
         this.output = output;
@@ -50,7 +51,7 @@ public class ParserTest
                     var rightNode = parser.Node.Children[2];
                     Assert.Equal("4", leftNode.GetValue());
                     Assert.Equal("3", rightNode.GetValue());
-                    output.WriteLine("left: "+ leftNode.GetValue() + " right: " + rightNode.GetValue());
+                    output.WriteLine("left: " + leftNode.GetValue() + " right: " + rightNode.GetValue());
                 }
             }
         }

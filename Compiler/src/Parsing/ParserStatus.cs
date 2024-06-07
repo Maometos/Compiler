@@ -1,4 +1,5 @@
-﻿namespace Apeirox.Parsing;
+﻿namespace Compiler.Parsing;
+
 public enum ParserStatus
 {
     Shift,

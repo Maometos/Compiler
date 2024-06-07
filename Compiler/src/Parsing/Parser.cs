@@ -1,6 +1,7 @@
-﻿using Apeirox.Lexing;
+﻿using Compiler.Lexing;
 
-namespace Apeirox.Parsing;
+namespace Compiler.Parsing;
+
 public class Parser
 {
     private Stack<int[]> stateStack = new Stack<int[]>();
