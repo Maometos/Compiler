@@ -3,19 +3,20 @@
 public class LexerBuilder
 {
     private Dictionary<string, string> patterns = new Dictionary<string, string>();
+    private List<string> ignoredPatterns = [];
 
-    public void Take(string name, string pattern)
+    public void Define(string name, string pattern)
     {
         patterns.Add(name, pattern);
     }
 
-    public void Skip(string pattern)
+    public void Ignore(string name)
     {
-        patterns.Add("SKIP", pattern);
+        ignoredPatterns.Add(name);
     }
 
     public Lexer Build()
     {
-        return new Lexer(patterns);
+        return new Lexer(patterns, ignoredPatterns);
     }
 }

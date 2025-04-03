@@ -7,12 +7,14 @@ public class Lexer
 {
     public Token Token { get; set; } = new Token("START");
     private Dictionary<string, string> patterns;
+    private List<string> ignoredPatterns;
     private StringBuilder input = new StringBuilder();
     private int offset = 0;
 
-    public Lexer(Dictionary<string, string> patterns)
+    public Lexer(Dictionary<string, string> patterns, List<string> ignoredPatterns)
     {
         this.patterns = patterns;
+        this.ignoredPatterns = ignoredPatterns;
     }
 
     public void Consume(string input)
@@ -42,7 +44,7 @@ public class Lexer
                     offset += tokenValue.Length;
                     input.Remove(0, tokenValue.Length);
 
-                    if (pattern.Key == "SKIP")
+                    if (ignoredPatterns.Contains(pattern.Key))
                     {
                         Advance();
                     }

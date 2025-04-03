@@ -18,12 +18,13 @@ public class ParserTest
     public void Test()
     {
         var lexerBuilder = new LexerBuilder();
-        lexerBuilder.Take("number", @"\d");
-        lexerBuilder.Take("times", @"(\*|/)");
-        lexerBuilder.Take("sign", @"(\+|-)");
-        lexerBuilder.Take("(", @"\(");
-        lexerBuilder.Take(")", @"\)");
-        lexerBuilder.Skip(@"\s+");
+        lexerBuilder.Define("number", @"\d");
+        lexerBuilder.Define("times", @"(\*|/)");
+        lexerBuilder.Define("sign", @"(\+|-)");
+        lexerBuilder.Define("(", @"\(");
+        lexerBuilder.Define(")", @"\)");
+        lexerBuilder.Define("space", @"\s+");
+        lexerBuilder.Ignore("space");
 
         var lexer = lexerBuilder.Build();
         var parserBuilder = new ParserBuilder(lexer);

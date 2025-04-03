@@ -16,13 +16,14 @@ public class LexerTest
     public void Test()
     {
         LexerBuilder lexerBuilder = new LexerBuilder();
-        lexerBuilder.Take("variable", @"[A-Za-z_][\w]*");
-        lexerBuilder.Take("number", @"\d");
-        lexerBuilder.Take("times", @"(\*|/)");
-        lexerBuilder.Take("sign", @"(\+|-)");
-        lexerBuilder.Take("equal", @"=");
-        lexerBuilder.Take("semicolon", @";");
-        lexerBuilder.Skip(@"\s+");
+        lexerBuilder.Define("variable", @"[A-Za-z_][\w]*");
+        lexerBuilder.Define("number", @"\d");
+        lexerBuilder.Define("times", @"(\*|/)");
+        lexerBuilder.Define("sign", @"(\+|-)");
+        lexerBuilder.Define("equal", @"=");
+        lexerBuilder.Define("semicolon", @";");
+        lexerBuilder.Define("space", @"\s+");
+        lexerBuilder.Ignore("space");
 
         var lexer = lexerBuilder.Build();
         var statement = "x1 = 2 * 5 + 4;";
@@ -50,7 +51,7 @@ public class LexerTest
     public void TestException()
     {
         LexerBuilder lexerBuilder = new LexerBuilder();
-        lexerBuilder.Take("variable", @"[A-Za-z_][\w]*");
+        lexerBuilder.Define("variable", @"[A-Za-z_][\w]*");
 
         var lexer = lexerBuilder.Build();
         var statement = "x1 = 5;";
