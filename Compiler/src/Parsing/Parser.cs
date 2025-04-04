@@ -199,21 +199,25 @@ public class Parser
         return matchedRules[0];
     }
 
-    public Token Lookahead(int level = 0)
+    public Token Lookahead(int depth = 0)
     {
-        var count = 0;
+        var index = 0;
         foreach (var token in bucket)
         {
-            if (count == level)
+            if (index == depth)
             {
                 return token;
             }
 
-            count++;
+            index++;
         }
 
-        lexer.Advance();
-        bucket.Enqueue(lexer.Token);
+        for (int i = 0; i < depth + 1; i++)
+        {
+            lexer.Advance();
+            bucket.Enqueue(lexer.Token);
+        }
+
         return lexer.Token;
     }
 }
