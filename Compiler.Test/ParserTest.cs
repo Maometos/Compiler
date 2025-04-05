@@ -24,6 +24,7 @@ public class ParserTest
         lexerBuilder.Define("sign", @"(\+|-)");
         lexerBuilder.Define("(", @"\(");
         lexerBuilder.Define(")", @"\)");
+        lexerBuilder.Define("=", @"=");
         lexerBuilder.Define("space", @"\s+");
         lexerBuilder.Ignore("space");
 
@@ -37,8 +38,9 @@ public class ParserTest
         parserBuilder.Define("Factor", ["(", "Expression", ")"]); // id = 5
         parserBuilder.Define("Factor", ["number"]); // id = 6
 
-        var statement = "5 + 4 * 3";
+        var statement = "5 * (4 + 3)";
         var parser = parserBuilder.Build();
+
         parser.Consume(statement);
 
         while (parser.Status != ParserStatus.Accepted)
@@ -46,13 +48,15 @@ public class ParserTest
             parser.Advance();
             if (parser.Status == ParserStatus.Reduced)
             {
-                if (parser.ReduceId == 3)
+                if (parser.ReduceId == 5)
                 {
-                    var leftNode = parser.Node.Children[0];
-                    var rightNode = parser.Node.Children[2];
-                    Assert.Equal("4", leftNode.GetValue());
-                    Assert.Equal("3", rightNode.GetValue());
-                    output.WriteLine("left: " + leftNode.GetValue() + " right: " + rightNode.GetValue());
+                    var leftValue = parser.GetValue(0);
+                    var rightValue = parser.GetValue(2);
+                    Assert.Equal("(", leftValue);
+                    Assert.Equal(")", rightValue);
+                    output.WriteLine("Reduced rule Id: 5");
+                    output.WriteLine("left token value: " + leftValue);
+                    output.WriteLine("right token value: " + rightValue);
                 }
             }
         }

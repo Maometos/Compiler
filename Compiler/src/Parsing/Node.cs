@@ -11,15 +11,4 @@ public class Node
         Type = type;
         Value = value;
     }
-
-    public string? GetValue()
-    {
-        if (Value == null && Children.Count == 1)
-        {
-            var node = Children[0];
-            return node.GetValue();
-        }
-
-        return Value;
-    }
 }

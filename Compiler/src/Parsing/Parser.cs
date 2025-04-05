@@ -217,4 +217,26 @@ public class Parser
         bucket.Enqueue(lexer.Token);
         return lexer.Token;
     }
+
+    public string? GetValue(int? index = null)
+    {
+        if (index == null)
+        {
+            return Node.Value;
+        }
+
+        var node = Node.Children[(int)index] ?? null;
+
+        if (node == null)
+        {
+            return null;
+        }
+
+        while (node.Children.Count() == 1)
+        {
+            node = Node.Children[0];
+        }
+
+        return node.Value;
+    }
 }
