@@ -19,26 +19,31 @@ public class ParserTest
     {
         var lexerBuilder = new LexerBuilder();
         lexerBuilder.Define("number", @"\d");
+        lexerBuilder.Define("variable", @"[A-Za-z_][\w]*");
         lexerBuilder.Define("times", @"(\*|/)");
         lexerBuilder.Define("sign", @"(\+|-)");
         lexerBuilder.Define("(", @"\(");
         lexerBuilder.Define(")", @"\)");
+        lexerBuilder.Define("=", @"=");
         lexerBuilder.Define("space", @"\s+");
         lexerBuilder.Ignore("space");
 
         var lexer = lexerBuilder.Build();
         var parserBuilder = new ParserBuilder(lexer);
 
-        int rule0 = parserBuilder.Define("Statement", ["Expression"]); // id = 0
-        int rule1 = parserBuilder.Define("Expression", ["Expression", "sign", "Term"]); // id = 1
-        int rule2 = parserBuilder.Define("Expression", ["Term"]); // id = 2
-        int rule3 = parserBuilder.Define("Term", ["Term", "times", "Factor"]); // id = 3
-        int rule4 = parserBuilder.Define("Term", ["Factor"]); // id = 4
-        int rule5 = parserBuilder.Define("Factor", ["(", "Expression", ")"]); // id = 5
-        int rule6 = parserBuilder.Define("Factor", ["number"]); // id = 6
+        parserBuilder.Define("Statement", ["Expression"]); // id = 0
+        parserBuilder.Define("Expression", ["Expression", "sign", "Term"]); // id = 1
+        parserBuilder.Define("Expression", ["Term"]); // id = 2
+        parserBuilder.Define("Term", ["Term", "times", "Factor"]); // id = 3
+        parserBuilder.Define("Term", ["Factor"]); // id = 4
+        parserBuilder.Define("Factor", ["(", "Expression", ")"]); // id = 5
+        parserBuilder.Define("Factor", ["number"]); // id = 6
+        parserBuilder.Define("Factor", ["variable"]); // id = 7
+        parserBuilder.Define("Factor", ["Assignment"]); // id = 8
+        parserBuilder.Define("Assignment", ["variable", "=", "Expression"]); // id = 9
 
         var parser = parserBuilder.Build();
-        var statement = "5 + 4 * 3";
+        var statement = "x = 5 * (4 + 3)";
         parser.Consume(statement);
 
         while (parser.Status != ParserStatus.Accept)
@@ -46,13 +51,14 @@ public class ParserTest
             parser.Advance();
             if (parser.Status == ParserStatus.Reduce)
             {
-                if (parser.ReduceId == rule3)
+                if (parser.ReduceId == 5)
                 {
                     var leftNode = parser.Node.Children[0];
                     var rightNode = parser.Node.Children[2];
-                    Assert.Equal("4", leftNode.GetValue());
-                    Assert.Equal("3", rightNode.GetValue());
-                    output.WriteLine("left: " + leftNode.GetValue() + " right: " + rightNode.GetValue());
+                    Assert.Equal("(", leftNode.GetValue());
+                    Assert.Equal(")", rightNode.GetValue());
+                    output.WriteLine("left node: " + leftNode.GetValue());
+                    output.WriteLine(" right node: " + rightNode.GetValue());
                 }
             }
         }

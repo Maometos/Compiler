@@ -23,13 +23,69 @@ public class Parser
     public void Consume(string input)
     {
         lexer.Consume(input);
-        var token = Lookahead();
-        var rule = GetMatchedRule(rules, token.Type);
-        if (rule != null)
+        lexer.Advance();
+
+        // Temporally shift the initial token to be used for getting the initial matched rule.
+        var initialToken = lexer.Token;
+        var initialRule = GetMatchedRule(rules, initialToken.Type);
+        if (initialRule != null)
         {
             // Initial state.
-            stateStack.Push([rule.Id, -1]);
+            stateStack.Push([initialRule.Id, -1]);
         }
+
+        // The parser's bucket could have tokens stored during getting the initial matched rule process because of the lookahead method.
+        // The initial token must be moved back to the front of the parser's bucket so that it can be processed when the first shift action is performed.
+        var bucket = new Queue<Token>();
+        bucket.Enqueue(initialToken);
+        foreach (var token in this.bucket)
+        {
+            bucket.Enqueue(token);
+        }
+
+        this.bucket = bucket;
+    }
+
+    private Rule? GetMatchedRule(List<Rule> rules, string item, int position = 0)
+    {
+        var matchedRules = new List<Rule>();
+        foreach (var rule in rules)
+        {
+            if (rule.Predicate.Length >= position + 1 && rule.Predicate[position] == item)
+            {
+                matchedRules.Add(rule);
+            }
+        }
+
+        if (matchedRules.Count == 0) return null;
+        if (matchedRules.Count == 1) return matchedRules.First();
+
+        var token = Lookahead(position);
+        var matchedRule = GetMatchedRule(matchedRules, token.Type, position + 1);
+        if (matchedRule != null) return matchedRule;
+        return matchedRules[0];
+    }
+
+    private Token Lookahead(int depth = 0)
+    {
+        var index = 0;
+        foreach (var token in bucket)
+        {
+            if (index == depth)
+            {
+                return token;
+            }
+
+            index++;
+        }
+
+        for (int i = 0; i < depth + 1; i++)
+        {
+            lexer.Advance();
+            bucket.Enqueue(lexer.Token);
+        }
+
+        return lexer.Token;
     }
 
     public void Advance()
@@ -177,47 +233,5 @@ public class Parser
                 stateStack.Push(state);
             }
         }
-    }
-
-    public Rule? GetMatchedRule(List<Rule> rules, string item, int position = 0)
-    {
-        var matchedRules = new List<Rule>();
-        foreach (var rule in rules)
-        {
-            if (rule.Predicate.Length >= position + 1 && rule.Predicate[position] == item)
-            {
-                matchedRules.Add(rule);
-            }
-        }
-
-        if (matchedRules.Count == 0) return null;
-        if (matchedRules.Count == 1) return matchedRules.First();
-
-        var token = Lookahead(position);
-        var matchedRule = GetMatchedRule(matchedRules, token.Type, position + 1);
-        if (matchedRule != null) return matchedRule;
-        return matchedRules[0];
-    }
-
-    public Token Lookahead(int depth = 0)
-    {
-        var index = 0;
-        foreach (var token in bucket)
-        {
-            if (index == depth)
-            {
-                return token;
-            }
-
-            index++;
-        }
-
-        for (int i = 0; i < depth + 1; i++)
-        {
-            lexer.Advance();
-            bucket.Enqueue(lexer.Token);
-        }
-
-        return lexer.Token;
     }
 }
