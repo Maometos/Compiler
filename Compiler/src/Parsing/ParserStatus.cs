@@ -2,7 +2,7 @@
 
 public enum ParserStatus
 {
-    Shift,
-    Reduce,
-    Accept
+    Shifted,
+    Reduced,
+    Accepted
 }

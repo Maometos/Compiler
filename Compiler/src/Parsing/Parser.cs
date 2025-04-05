@@ -10,7 +10,7 @@ public class Parser
     private List<Rule> rules;
     private Lexer lexer;
 
-    public ParserStatus Status { get; set; } = ParserStatus.Shift;
+    public ParserStatus Status { get; set; } = ParserStatus.Shifted;
     public Node Node => nodeStack.Count > 0 ? nodeStack.Peek() : new Node("");
     public int? ReduceId { get; set; } = null;
 
@@ -34,7 +34,7 @@ public class Parser
 
     public void Advance()
     {
-        if (Status == ParserStatus.Accept)
+        if (Status == ParserStatus.Accepted)
         {
             return;
         }
@@ -48,7 +48,7 @@ public class Parser
         Goto();
     }
 
-    public void Shift()
+    private void Shift()
     {
         Token token;
         if (bucket.Count > 0)
@@ -68,10 +68,10 @@ public class Parser
         state[1] = position + 1;
         stateStack.Push(state);
 
-        Status = ParserStatus.Shift;
+        Status = ParserStatus.Shifted;
     }
 
-    public bool Reduce()
+    private bool Reduce()
     {
         if (stateStack.Count == 0 || nodeStack.Count == 0) return false;
 
@@ -99,18 +99,18 @@ public class Parser
         stateStack.Pop();
         ReduceId = rule.Id;
 
-        Status = ParserStatus.Reduce;
+        Status = ParserStatus.Reduced;
         if (rule.Id == 0)
         {
-            Status = ParserStatus.Accept;
+            Status = ParserStatus.Accepted;
         }
 
         return true;
     }
 
-    public void Goto()
+    private void Goto()
     {
-        if (Status == ParserStatus.Reduce)
+        if (Status == ParserStatus.Reduced)
         {
             Token token;
             Rule? rule;
@@ -132,6 +132,7 @@ public class Parser
             var position = state[1];
 
             token = Lookahead();
+            // Check if can be shifted
             if (rule.Predicate.Length > position + 1 && rule.Predicate[position] == node.Type && rule.Predicate[position + 1] == token.Type)
             {
                 return;
@@ -161,7 +162,7 @@ public class Parser
                 stateStack.Push(state);
             }
         }
-        else if (Status == ParserStatus.Shift)
+        else if (Status == ParserStatus.Shifted)
         {
             var state = stateStack.Peek();
             var rule = rules[state[0]];

@@ -18,6 +18,7 @@ public class ParserTest
     public void Test()
     {
         var lexerBuilder = new LexerBuilder();
+
         lexerBuilder.Define("number", @"\d");
         lexerBuilder.Define("times", @"(\*|/)");
         lexerBuilder.Define("sign", @"(\+|-)");
@@ -26,27 +27,26 @@ public class ParserTest
         lexerBuilder.Define("space", @"\s+");
         lexerBuilder.Ignore("space");
 
-        var lexer = lexerBuilder.Build();
-        var parserBuilder = new ParserBuilder(lexer);
+        var parserBuilder = new ParserBuilder(lexerBuilder.Build());
 
-        int rule0 = parserBuilder.Define("Statement", ["Expression"]); // id = 0
-        int rule1 = parserBuilder.Define("Expression", ["Expression", "sign", "Term"]); // id = 1
-        int rule2 = parserBuilder.Define("Expression", ["Term"]); // id = 2
-        int rule3 = parserBuilder.Define("Term", ["Term", "times", "Factor"]); // id = 3
-        int rule4 = parserBuilder.Define("Term", ["Factor"]); // id = 4
-        int rule5 = parserBuilder.Define("Factor", ["(", "Expression", ")"]); // id = 5
-        int rule6 = parserBuilder.Define("Factor", ["number"]); // id = 6
+        parserBuilder.Define("Statement", ["Expression"]); // id = 0
+        parserBuilder.Define("Expression", ["Expression", "sign", "Term"]); // id = 1
+        parserBuilder.Define("Expression", ["Term"]); // id = 2
+        parserBuilder.Define("Term", ["Term", "times", "Factor"]); // id = 3
+        parserBuilder.Define("Term", ["Factor"]); // id = 4
+        parserBuilder.Define("Factor", ["(", "Expression", ")"]); // id = 5
+        parserBuilder.Define("Factor", ["number"]); // id = 6
 
-        var parser = parserBuilder.Build();
         var statement = "5 + 4 * 3";
+        var parser = parserBuilder.Build();
         parser.Consume(statement);
 
-        while (parser.Status != ParserStatus.Accept)
+        while (parser.Status != ParserStatus.Accepted)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduce)
+            if (parser.Status == ParserStatus.Reduced)
             {
-                if (parser.ReduceId == rule3)
+                if (parser.ReduceId == 3)
                 {
                     var leftNode = parser.Node.Children[0];
                     var rightNode = parser.Node.Children[2];
