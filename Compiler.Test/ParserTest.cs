@@ -46,10 +46,10 @@ public class ParserTest
         var statement = "x = 5 * (4 + 3)";
         parser.Consume(statement);
 
-        while (parser.Status != ParserStatus.Accept)
+        while (parser.Status != ParserStatus.Accepted)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduce)
+            if (parser.Status == ParserStatus.Reduced)
             {
                 if (parser.ReduceId == 5)
                 {
