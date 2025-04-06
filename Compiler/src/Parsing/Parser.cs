@@ -12,7 +12,7 @@ public class Parser
 
     public ParserStatus Status { get; set; } = ParserStatus.Shifted;
     public Node Node => nodeStack.Count > 0 ? nodeStack.Peek() : new Node("");
-    public int? ReduceId { get; set; } = null;
+    public int? RuleId { get; set; } = null;
 
     public Parser(List<Rule> rules, Lexer lexer)
     {
@@ -123,6 +123,7 @@ public class Parser
         state[1] = position + 1;
         stateStack.Push(state);
 
+        RuleId = state[0];
         Status = ParserStatus.Shifted;
     }
 
@@ -152,7 +153,7 @@ public class Parser
         node.Children.Reverse();
         nodeStack.Push(node);
         stateStack.Pop();
-        ReduceId = rule.Id;
+        RuleId = rule.Id;
 
         Status = ParserStatus.Reduced;
         if (rule.Id == 0)

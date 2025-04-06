@@ -51,7 +51,7 @@ public class ParserTest
             parser.Advance();
             if (parser.Status == ParserStatus.Reduced)
             {
-                switch (parser.ReduceId)
+                switch (parser.RuleId)
                 {
                     case 1:
                         var leftOperand = parser.GetValue(0);
