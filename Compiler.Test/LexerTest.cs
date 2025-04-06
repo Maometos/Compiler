@@ -6,15 +6,12 @@ namespace Compiler.Tests;
 public class LexerTest
 {
     private readonly ITestOutputHelper output;
+    private readonly Lexer lexer;
 
     public LexerTest(ITestOutputHelper output)
     {
         this.output = output;
-    }
 
-    [Fact]
-    public void Test()
-    {
         LexerBuilder lexerBuilder = new LexerBuilder();
         lexerBuilder.Define("variable", @"[A-Za-z_][\w]*");
         lexerBuilder.Define("number", @"\d");
@@ -25,24 +22,29 @@ public class LexerTest
         lexerBuilder.Define("space", @"\s+");
         lexerBuilder.Ignore("space");
 
-        var lexer = lexerBuilder.Build();
+        lexer = lexerBuilder.Build();
+    }
+
+    [Fact]
+    public void Test()
+    {
         var statement = "x1 = 2 * 5 + 4;";
         lexer.Consume(statement);
 
-        string[] expectedValues = ["x1", "=", "2", "*", "5", "+", "4", ";"];
         var index = 0;
+        string[] expectedValues = ["x1", "=", "2", "*", "5", "+", "4", ";"];
 
         while (true)
         {
             lexer.Advance();
 
-            if (lexer.Token.Type == "END")
+            if (lexer.Token.Name == "END")
             {
                 break;
             }
 
             Assert.Equal(expectedValues[index], lexer.Token.Value);
-            output.WriteLine("Token: " + lexer.Token.Type + " => " + lexer.Token.Value);
+            output.WriteLine("Token: " + lexer.Token.Name + " => " + lexer.Token.Value);
             index++;
         }
     }
@@ -50,17 +52,16 @@ public class LexerTest
     [Fact]
     public void TestException()
     {
-        LexerBuilder lexerBuilder = new LexerBuilder();
-        lexerBuilder.Define("variable", @"[A-Za-z_][\w]*");
-
-        var lexer = lexerBuilder.Build();
-        var statement = "x1 = 5;";
+        var statement = "x1 = ?";
         lexer.Consume(statement);
-        //The first occurrence must match x1 according to the given pattern.
+
         lexer.Advance();
         Assert.Equal("x1", lexer.Token.Value);
 
-        // This must throw an exception because there is no pattern match for the next occurrence.
+        lexer.Advance();
+        Assert.Equal("=", lexer.Token.Value);
+
+        // This must throw an exception because there is no registered pattern match for the character '?'
         Assert.Throws<LexerException>(() => lexer.Advance());
     }
 }

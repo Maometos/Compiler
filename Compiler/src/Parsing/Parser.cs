@@ -26,7 +26,7 @@ public class Parser
         // Temporary shifting of the initial token so that can be used for retrieving the initial matched rule.
         lexer.Advance();
         var initialToken = lexer.Token;
-        var initialRule = GetMatchedRule(rules, initialToken.Type);
+        var initialRule = GetMatchedRule(rules, initialToken.Name);
         if (initialRule != null)
         {
             // Initial state.
@@ -60,7 +60,7 @@ public class Parser
         if (matchedRules.Count == 1) return matchedRules.First();
 
         var token = Lookahead(position);
-        var matchedRule = GetMatchedRule(matchedRules, token.Type, position + 1);
+        var matchedRule = GetMatchedRule(matchedRules, token.Name, position + 1);
         if (matchedRule != null) return matchedRule;
         return matchedRules[0];
     }
@@ -116,7 +116,7 @@ public class Parser
             token = lexer.Token;
         }
 
-        nodeStack.Push(new Node(token.Type, token.Value));
+        nodeStack.Push(new Node(token.Name, token.Value));
 
         var state = stateStack.Pop();
         var position = state[1];
@@ -139,7 +139,7 @@ public class Parser
         if (rule.Predicate.Length != position + 1) return false;
         if (rule.Predicate[position] != node.Type) return false;
         var token = Lookahead();
-        var nextRule = GetMatchedRule(rules, token.Type, position);
+        var nextRule = GetMatchedRule(rules, token.Name, position);
         // Check if the current item has a follow
         if (nextRule != null && nextRule.Predicate[0] == node.Type) return false;
 
@@ -189,7 +189,7 @@ public class Parser
 
             token = Lookahead();
             // Check if can be shifted
-            if (rule.Predicate.Length > position + 1 && rule.Predicate[position] == node.Type && rule.Predicate[position + 1] == token.Type)
+            if (rule.Predicate.Length > position + 1 && rule.Predicate[position] == node.Type && rule.Predicate[position + 1] == token.Name)
             {
                 return;
             }
@@ -198,12 +198,12 @@ public class Parser
             if (rule.Predicate.Length == position + 1 && rule.Predicate[position] == node.Type)
             {
                 token = Lookahead();
-                if (token.Type == "END")
+                if (token.Name == "END")
                 {
                     return;
                 }
 
-                rule = GetMatchedRule(rules, token.Type, position);
+                rule = GetMatchedRule(rules, token.Name, position);
                 // Check if the current item has a follow
                 if (rule != null && rule.Predicate[0] != node.Type)
                 {
