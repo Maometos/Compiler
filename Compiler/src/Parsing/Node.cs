@@ -2,13 +2,13 @@
 
 public class Node
 {
-    public string Type { get; set; }
+    public string Name { get; set; }
     public string? Value { get; set; }
-    public List<Node> Children { get; set; } = new List<Node>();
+    public List<Node> Children { get; set; } = [];
 
     public Node(string type, string? value = null)
     {
-        Type = type;
+        Name = type;
         Value = value;
     }
 }

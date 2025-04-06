@@ -137,11 +137,11 @@ public class Parser
         var position = state[1];
 
         if (rule.Predicate.Length != position + 1) return false;
-        if (rule.Predicate[position] != node.Type) return false;
+        if (rule.Predicate[position] != node.Name) return false;
         var token = Lookahead();
         var nextRule = GetMatchedRule(rules, token.Name, position);
         // Check if the current item has a follow
-        if (nextRule != null && nextRule.Predicate[0] == node.Type) return false;
+        if (nextRule != null && nextRule.Predicate[0] == node.Name) return false;
 
         node = new Node(rule.Name);
         for (int i = 0; i <= position; i++)
@@ -174,7 +174,7 @@ public class Parser
             var node = nodeStack.Peek();
             if (stateStack.Count == 0)
             {
-                rule = GetMatchedRule(rules, node.Type);
+                rule = GetMatchedRule(rules, node.Name);
                 if (rule != null)
                 {
                     state = [rule.Id, 0];
@@ -189,13 +189,13 @@ public class Parser
 
             token = Lookahead();
             // Check if can be shifted
-            if (rule.Predicate.Length > position + 1 && rule.Predicate[position] == node.Type && rule.Predicate[position + 1] == token.Name)
+            if (rule.Predicate.Length > position + 1 && rule.Predicate[position] == node.Name && rule.Predicate[position + 1] == token.Name)
             {
                 return;
             }
 
             // Checks if can be reduced
-            if (rule.Predicate.Length == position + 1 && rule.Predicate[position] == node.Type)
+            if (rule.Predicate.Length == position + 1 && rule.Predicate[position] == node.Name)
             {
                 token = Lookahead();
                 if (token.Name == "END")
@@ -205,13 +205,13 @@ public class Parser
 
                 rule = GetMatchedRule(rules, token.Name, position);
                 // Check if the current item has a follow
-                if (rule != null && rule.Predicate[0] != node.Type)
+                if (rule != null && rule.Predicate[0] != node.Name)
                 {
                     return;
                 }
             }
 
-            rule = GetMatchedRule(rules, node.Type);
+            rule = GetMatchedRule(rules, node.Name);
             if (rule != null)
             {
                 state = [rule.Id, 0];
@@ -225,10 +225,10 @@ public class Parser
             var position = state[1];
             var node = nodeStack.Peek();
 
-            if (rule.Predicate.Length >= position + 1 && rule.Predicate[position] != node.Type)
+            if (rule.Predicate.Length >= position + 1 && rule.Predicate[position] != node.Name)
             {
-                rule = GetMatchedRule(rules, node.Type);
-                if (rule == null) throw new ParserException("No matched rule for the item: '" + node.Type + "' in the position: " + position);
+                rule = GetMatchedRule(rules, node.Name);
+                if (rule == null) throw new ParserException("No matched rule for the item: '" + node.Name + "' in the position: " + position);
 
                 state = [rule.Id, 0];
                 stateStack.Push(state);
