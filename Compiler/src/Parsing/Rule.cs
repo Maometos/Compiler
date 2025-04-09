@@ -3,13 +3,13 @@
 public class Rule
 {
     public int Id { get; }
-    public string Name { get; }
-    public string[] Predicate { get; }
+    public string Head { get; }
+    public string[] Body { get; }
 
-    public Rule(int id, string name, string[] predicate)
+    public Rule(int id, string head, string[] body)
     {
         Id = id;
-        Name = name;
-        Predicate = predicate;
+        Head = head;
+        Body = body;
     }
 }

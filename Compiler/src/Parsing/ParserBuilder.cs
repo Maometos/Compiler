@@ -12,10 +12,10 @@ public class ParserBuilder
         this.lexer = lexer;
     }
 
-    public int Define(string name, string[] production)
+    public int Define(string head, string[] body)
     {
         var index = rules.Count;
-        rules.Add(new Rule(index, name, production));
+        rules.Add(new Rule(index, head, body));
         return index;
     }
 
