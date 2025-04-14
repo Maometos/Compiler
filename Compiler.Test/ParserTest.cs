@@ -67,10 +67,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {
@@ -110,10 +110,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {
@@ -158,10 +158,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {
@@ -203,10 +203,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {
@@ -241,10 +241,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {
@@ -277,10 +277,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {
@@ -318,10 +318,10 @@ public class ParserTest
         parser.Consume(statement);
 
         var count = 0;
-        while (parser.Status != ParserStatus.Accepted)
+        while (parser.Action != ParserAction.Accept)
         {
             parser.Advance();
-            if (parser.Status == ParserStatus.Reduced)
+            if (parser.Action == ParserAction.Reduce)
             {
                 switch (parser.RuleId)
                 {

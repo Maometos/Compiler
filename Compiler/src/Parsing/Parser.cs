@@ -10,7 +10,7 @@ public class Parser
     private List<Rule> rules;
     private Lexer lexer;
 
-    public ParserStatus Status { get; set; } = ParserStatus.Shifted;
+    public ParserAction Action { get; set; } = ParserAction.Shift;
     public Node Node => nodeStack.Count > 0 ? nodeStack.Peek() : new Node("");
     public int RuleId { get; set; }
 
@@ -106,7 +106,7 @@ public class Parser
 
     public void Advance()
     {
-        if (Status == ParserStatus.Accepted)
+        if (Action == ParserAction.Accept)
         {
             return;
         }
@@ -174,10 +174,10 @@ public class Parser
         stateStack.Pop();
         RuleId = rule.Id;
 
-        Status = ParserStatus.Reduced;
+        Action = ParserAction.Reduce;
         if (rule.Id == 0)
         {
-            Status = ParserStatus.Accepted;
+            Action = ParserAction.Accept;
         }
 
         return true;
@@ -209,7 +209,7 @@ public class Parser
         stateStack.Push(state);
 
         RuleId = state[0];
-        Status = ParserStatus.Shifted;
+        Action = ParserAction.Shift;
     }
 
     private void Goto(string item)
