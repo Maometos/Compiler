@@ -12,7 +12,7 @@ public class Parser
 
     public ParserStatus Status { get; set; } = ParserStatus.Shifted;
     public Node Node => nodeStack.Count > 0 ? nodeStack.Peek() : new Node("");
-    public int? RuleId { get; set; } = null;
+    public int RuleId { get; set; }
 
     public Parser(List<Rule> rules, Lexer lexer)
     {
@@ -47,22 +47,39 @@ public class Parser
 
     private Rule? GetMatchedRule(List<Rule> rules, string item, int position = 0)
     {
-        var matchedRules = new List<Rule>();
+        var ruleCandidates = new List<Rule>();
         foreach (var rule in rules)
         {
             if (rule.Body.Length > position && rule.Body[position] == item)
             {
-                matchedRules.Add(rule);
+                // Save the rule candidates that match the current item at the current position.
+                ruleCandidates.Add(rule);
             }
         }
 
-        if (matchedRules.Count == 0) return null;
-        if (matchedRules.Count == 1) return matchedRules.First();
+        if (ruleCandidates.Count == 0) return null;
+        if (ruleCandidates.Count == 1) return ruleCandidates.First();
 
+        // Try to get the rule candidate that can match the next item at the next position.
         var token = Lookahead(position);
-        var matchedRule = GetMatchedRule(matchedRules, token.Name, position + 1);
+        var matchedRule = GetMatchedRule(ruleCandidates, token.Name, position + 1);
         if (matchedRule != null) return matchedRule;
-        return matchedRules[0];
+
+        // Try to get the rule candidate that is a derivative of the previous rule.
+        if (stateStack.Count > 0)
+        {
+            foreach (var rule in ruleCandidates)
+            {
+                var state = stateStack.Peek();
+                var previousRule = rules[state[0]];
+                if (previousRule.Body[state[1]] == rule.Head)
+                {
+                    return rule;
+                }
+            }
+        }
+
+        return ruleCandidates[0];
     }
 
     private Token Lookahead(int depth = 0)
@@ -106,41 +123,27 @@ public class Parser
             var state = stateStack.Peek();
             var rule = rules[state[0]];
             var position = state[1];
-
             var nextToken = Lookahead();
-            // Do nothing if the next token can be shifted for the current rule in the next action.
-            if (rule.Body.Length > position + 1 && rule.Body[position + 1] == nextToken.Name)
+            var nextRule = GetMatchedRule(rules, nextToken.Name, 1);
+
+            // Go to a new rule state if the current item doesn't match the current item in the current rule state,
+            // or when it has a follow that fulfill the next derivative rule.
+            if ((rule.Body[position] != node.Name) || (nextRule != null && nextRule.Head == node.Name))
             {
-                return;
+                Goto(node.Name);
             }
-
-            // Do nothing if can be reduced for the current rule in the next action.
-            if (rule.Body.Length == position + 1 && rule.Body[position] == node.Name)
-            {
-                if (nextToken.Name == "END")
-                {
-                    return;
-                }
-
-                var nextRule = GetMatchedRule(rules, nextToken.Name, position);
-                // Do nothing if the current item doesn't has a follow that need to be shifted in the next action
-                if (nextRule != null && nextRule.Body[0] != node.Name)
-                {
-                    return;
-                }
-            }
-
-            Goto(node.Name);
         }
         else
         {
             Shift();
+
             var state = stateStack.Peek();
             var rule = rules[state[0]];
             var position = state[1];
             var node = nodeStack.Peek();
 
-            if (rule.Body.Length > position && rule.Body[position] != node.Name)
+            // Go to a new rule state if the current item doesn't match the current item in the current rule state.
+            if (rule.Body[position] != node.Name)
             {
                 Goto(node.Name);
             }
@@ -156,13 +159,8 @@ public class Parser
         var rule = rules[state[0]];
         var position = state[1];
 
-        // Return false when the current pointer is not at the end position or the current item does not match the item of the current rule at the given position.
-        if (rule.Body.Length != position + 1 || rule.Body[position] != node.Name) return false;
-
-        var nextToken = Lookahead();
-        var nextRule = GetMatchedRule(rules, nextToken.Name, position);
-        // Return false when the current item has a follow that need to be shifted in the next action
-        if (nextRule != null && nextRule.Body[0] == node.Name) return false;
+        // Return false when the current pointer doesn't point to the current item at the last position of the current rule state.
+        if (rule.Body.Length - 1 != position || rule.Body[position] != node.Name) return false;
 
         node = new Node(rule.Head);
         for (int i = 0; i <= position; i++)
@@ -200,6 +198,11 @@ public class Parser
 
         nodeStack.Push(new Node(token.Name, token.Value));
 
+        if (stateStack.Count == 0)
+        {
+            throw new ParserException($"Cannot shift the token '{token.Name}' with value '{token.Value}' to unknown rule!");
+        }
+
         var state = stateStack.Pop();
         var position = state[1];
         state[1] = position + 1;
@@ -217,8 +220,6 @@ public class Parser
             int[] state = [rule.Id, 0];
             stateStack.Push(state);
         }
-
-        //throw new ParserException("No matched rule for the item: '" + item);
     }
 
     public string? GetValue(int? index = null)
