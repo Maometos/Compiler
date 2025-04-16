@@ -104,15 +104,43 @@ public class Parser
         return lexer.Token;
     }
 
+    private ParserAction TakeAction()
+    {
+        if (RuleId == 0 && (Action == ParserAction.Reduce || Action == ParserAction.Accept)) return ParserAction.Accept;
+
+        var state = stateStack.Peek();
+        var rule = rules[state[0]];
+        var position = state[1];
+
+        // Shift when the current pointer is not at the last position of the current rule state.
+        if (rule.Body.Length - 1 != position) return ParserAction.Shift;
+
+        return ParserAction.Reduce;
+    }
+
     public void Advance()
     {
-        if (Action == ParserAction.Accept)
-        {
-            return;
-        }
+        Action = TakeAction();
 
-        if (Reduce())
+        if (Action == ParserAction.Shift)
         {
+            Shift();
+
+            var node = nodeStack.Peek();
+            var state = stateStack.Peek();
+            var rule = rules[state[0]];
+            var position = state[1];
+
+            // Go to a new rule state if the current item doesn't match the current item in the current rule state.
+            if (rule.Body[position] != node.Name)
+            {
+                Goto(node.Name);
+            }
+        }
+        else if (Action == ParserAction.Reduce)
+        {
+            Reduce();
+
             var node = nodeStack.Peek();
             if (stateStack.Count == 0)
             {
@@ -133,34 +161,14 @@ public class Parser
                 Goto(node.Name);
             }
         }
-        else
-        {
-            Shift();
-
-            var state = stateStack.Peek();
-            var rule = rules[state[0]];
-            var position = state[1];
-            var node = nodeStack.Peek();
-
-            // Go to a new rule state if the current item doesn't match the current item in the current rule state.
-            if (rule.Body[position] != node.Name)
-            {
-                Goto(node.Name);
-            }
-        }
     }
 
-    private bool Reduce()
+    private void Reduce()
     {
-        if (stateStack.Count == 0 || nodeStack.Count == 0) return false;
-
         var node = nodeStack.Peek();
         var state = stateStack.Peek();
         var rule = rules[state[0]];
         var position = state[1];
-
-        // Return false when the current pointer doesn't point to the current item at the last position of the current rule state.
-        if (rule.Body.Length - 1 != position || rule.Body[position] != node.Name) return false;
 
         node = new Node(rule.Head);
         for (int i = 0; i <= position; i++)
@@ -173,14 +181,6 @@ public class Parser
         nodeStack.Push(node);
         stateStack.Pop();
         RuleId = rule.Id;
-
-        Action = ParserAction.Reduce;
-        if (rule.Id == 0)
-        {
-            Action = ParserAction.Accept;
-        }
-
-        return true;
     }
 
     private void Shift()
@@ -207,9 +207,7 @@ public class Parser
         var position = state[1];
         state[1] = position + 1;
         stateStack.Push(state);
-
         RuleId = state[0];
-        Action = ParserAction.Shift;
     }
 
     private void Goto(string item)
